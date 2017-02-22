@@ -3,7 +3,7 @@ use futures::sink::BoxSink;
 use futures::stream::BoxStream;
 use futures::sync::{oneshot, mpsc};
 use futures::{Future, Stream, Sink, Async, Poll, BoxFuture};
-use protobuf::{self, Message};
+use protobuf::{self, Message, ProtobufEnum};
 
 use mercury::MercuryError;
 use player::Player;
@@ -249,6 +249,7 @@ impl SpircTask {
             return;
         }
 
+        println!("{:?}", frame.get_typ().value());
         match frame.get_typ() {
             MessageType::kMessageTypeHello => {
                 self.notify(Some(frame.get_ident()));
@@ -371,6 +372,12 @@ impl SpircTask {
                     self.state.set_status(PlayStatus::kPlayStatusStop);
                     self.player.stop();
                     self.mixer.stop();
+                }
+                else
+                {
+                    // XXX: `frame` should contain all the external device metadata we need
+                    println!("{:?}", frame);
+                    println!("Notify external player");
                 }
             }
 
